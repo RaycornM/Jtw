@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.dao.ProductDao">
+    <resultMap id="productMap" type="Product">
+        <id property="id" column="product_id"/>
+        <result property="name" column="product_name"/>
+        <result property="title" column="product_title"/>
+        <result property="price" column="product_price"/>
+        <result property="salePrice" column="product_sale_price"/>
+        <result property="status" column="product_status"/>
+        <result property="createTime" column="product_create"/>
+        <result property="modifiedTime" column="product_modified"/>
+        <association property="category" column="category_id" resultMap="categoryMap"/>
+        <collection property="images" ofType="ProductImage">
+            <id property="id" column="image_id"/>
+            <result property="type" column="image_type"/>
+            <result property="src" column="image_src"/>
+        </collection>
+    </resultMap>
+    <resultMap id="categoryMap" type="Category">
+        <id property="id" column="category_id"/>
+        <result property="name" column="category_name"/>
+        <result property="imageSrc" column="category_image_src"/>
+        <result property="createTime" column="category_create"/>
+        <result property="modifiedTime" column="category_modified"/>
+    </resultMap>
+    <select id="listPage" resultMap="productMap">
+        select * from t_product limit 0, 21
+    </select>
+    <!-- 查询一件商品 -->
+    <select id="getById" parameterType="int" resultMap="productMap">
+        select * from t_product t1, t_product_image t2 where t1.product_id=t2.product_id
+                                                         and t1.product_id=#{id}
+    </select>
+</mapper>

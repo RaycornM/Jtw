@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- 引入jQuery文件 -->
+    <script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            // 获取注册按钮,并注册单击事件
+            $("#btn").click(function () {
+                // 获取用户名
+                var username = $("input[name='username']").val();
+                // 获取密码
+                var password = $("input[name='password']").val();
+                // 获取昵称
+                var nickname = $("input[name='nickname']").val();
+                var reg = true;
+                if (username == "") {
+                    reg = false;
+                    alert("用户名不能为空");
+                }
+                if (password == "") {
+                    reg = false;
+                    alert("密码不能为空");
+                }
+                if (nickname == "") {
+                    reg = false;
+                    alert("昵称不能为空");
+                }
+                if (reg) {
+                    // 发送AJAX请求
+                    $.ajax({
+                        url : "../user/register", // 请求地址
+                        type : "post", // 发送post请求
+                        data : {username : username, password : password, nickname : nickname}, // 发送的数据
+                        success : function (result) { // 请求成功的回调函数
+                            if (result == "success") {
+                                alert("注册成功");
+                                // 访问登录页面
+                                window.location.href = "login.html";
+                            }
+                            else {
+                                alert(result);
+                            }
+                        }
+                    });
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+    <form id="form">
+        用户名:<input type="text" name="username"><br><br>
+        密码:<input type="password" name="password"><br><br>
+        昵称:<input type="text" name="nickname"><br><br>
+        <input type="button" value="注册" id="btn">
+    </form>
+</body>
+</html>

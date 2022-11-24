@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.dao.UserDao">
+    <resultMap id="userMap" type="User">
+        <id property="id" column="user_id"/>
+        <result property="username" column="user_username"/>
+        <result property="nickname" column="user_nickname"/>
+        <result property="password" column="user_password"/>
+        <result property="gender" column="user_gender"/>
+        <result property="birthday" column="user_birthday"/>
+        <result property="profilePictureSrc" column="user_profile_picture_src"/>
+        <result property="createTime" column="user_create"/>
+        <result property="modifiedTime" column="user_modified"/>
+        <association property="address" column="user_address" resultMap="addressMap"/>
+        <association property="hometown" column="user_hometown" resultMap="addressMap"/>
+    </resultMap>
+    <resultMap id="addressMap" type="Address">
+        <id property="id" column="address_id"/>
+        <result property="name" column="address_name"/>
+        <result property="createTime" column="address_create"/>
+        <result property="modifiedTime" column="address_modified"/>
+        <association property="regionId" javaType="Address">
+            <id property="id" column="address_region_id"/>
+        </association>
+    </resultMap>
+
+    <!-- 用户注册 -->
+    <insert id="register" parameterType="User">
+        insert into
+            t_user
+        (
+            user_username,
+            user_password,
+            user_nickname,
+            user_gender,
+            user_birthday,
+            user_address,
+            user_hometown,
+            user_profile_picture_src,
+            user_create,
+            user_modified
+        )
+        values
+        (
+            #{username},
+            #{password},
+            #{nickname},
+            #{gender},
+            #{birthday},
+            #{address.id},
+            #{hometown.id},
+            #{profilePictureSrc},
+            now(),
+            now()
+        )
+    </insert>
+    <select id="login" parameterType="String" resultMap="userMap">
+        select * from t_user where user_username=#{username}
+    </select>
+</mapper>

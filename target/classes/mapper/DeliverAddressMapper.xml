@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.dao.DeliverAddressDao">
+    <resultMap id="deliverAddressMap" type="DeliverAddress">
+        <id property="id" column="deliver_id"/>
+        <result property="deliverAddress" column="deliver_address"/>
+        <result property="deliverDetailAddress" column="deliver_detail_address"/>
+        <result property="deliverPost" column="deliver_post"/>
+        <result property="deliverRecever" column="deliver_receiver"/>
+        <result property="deliverMobile" column="deliver_mobile"/>
+        <result property="deliverIsDefault" column="deliver_is_default"/>
+        <result property="createTime" column="deliver_create"/>
+        <result property="modifiedTime" column="deliver_modified"/>
+        <association property="user" column="user_id" resultMap="UserMap"/>
+    </resultMap>
+
+</mapper>

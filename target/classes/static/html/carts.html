@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的购物车</title>
+    <style type="text/css">
+        * {
+            margin: 0px;
+            padding: 0px;
+            font-size: 12px;
+        }
+        #con {
+            margin-top: 20px;
+        }
+        #c_con {
+            width: 1000px;
+            position: relative;
+            left: 50%;
+            margin-left: -500px;
+        }
+        #c_con_head {
+            width: 1000px;
+            height: 30px;
+            text-align: right;
+            border-bottom: #881111 3px solid;
+        }
+        #c_con_head_s1, #c_con_head_s2 {
+            color: #881111;
+            font-weight: bold;
+        }
+        #c_con_head input {
+            width: 55px;
+            height: 25px;
+            background: #aaaaaa;
+            color: #ffffff;
+            border-radius: 5px;
+            border: 1px #aaaaaa solid;
+            cursor: text;
+        }
+        #c_con_table table {
+            margin-top: 20px;
+        }
+        #c_con_table table td {
+            text-align: center;
+            color: #3C3C3C;
+        }
+        .tr1 {
+            height: 40px;
+        }
+        .tr2 {
+            height: 130px;
+            background: #FCFCFC;
+        }
+        .td1 {
+            width: 70px;
+        }
+        .td2 {
+            width: 450px;
+        }
+        .td3, .td4, .td5 {
+            width: 120px;
+        }
+        .td2 li {
+            float: left;
+            list-style: none;
+        }
+        .tr2_li1 {
+            height: 80px;
+            width: 82px;
+            border: 1px #CCCCCC solid;
+        }
+        .tr2_li2 {
+            height: 80px;
+            width: 220px;
+            text-align: left;
+            margin-left: 10px;
+        }
+        .minus, .plus {
+            width: 20px;
+            height: 25px;
+            background: #F0F0F0;
+            cursor: pointer;
+            border: 1px #F0F0F0 solid;
+        }
+        .quantity {
+            width: 40px;
+            height: 25px;
+            text-align: center;
+        }
+        /*删除弹窗样式*/
+        #main {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            position: fixed;
+            z-index: 1;
+        }
+        #middle {
+            display: none;
+            height: 150px;
+            width: 380px;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            margin-top: -75px;
+            margin-left: -190px;
+            background: #ffffff;
+        }
+        #message {
+            height: 110px;
+            width: 320px;
+            position: relative;
+            top: 15px;
+            left: 50%;
+            margin-left: -160px;
+        }
+        #message ul li {
+            height: 35px;
+            width: 320px;
+            list-style: none;
+        }
+        #delete {
+            font-size: 16px;
+            font-weight: bold;
+            color: #3C3C3C;
+        }
+        #del {
+            font-size: 24px;
+            font-weight: bold;
+            color: #999999;
+            position: relative;
+            left: 250px;
+            cursor: pointer;
+        }
+        #content {
+            position: relative;
+            left: 12px;
+        }
+        #confirm {
+            height: 30px;
+            width: 60px;
+            background: #881111;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px #881111 solid;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            top: 7px;
+        }
+        #cancel {
+            height: 30px;
+            width: 60px;
+            background: #ffffff;
+            color: #881111;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px #D9D9D9 solid;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            top: 7px;
+            left: 5px;
+        }
+    </style>
+    <script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            localStorage
+            $.ajax({
+                url : "../cart/carts",
+                type : "get",
+                success : function (result) {
+                    if (result == "") {
+                        alert("您还没有登录,请先登录");
+                        window.location.href = "login.html";
+                    }
+                    else {
+                        var carts = eval(result);
+                        var s = "";
+                        for(var i = 0; i < carts.length; i++) {
+                            var cart = carts[i];
+                            var imageName = "";
+                            // 获取当前购物车记录的商品的所有图片
+                            var images = cart.product.images;
+                            for (var j = 0; j < images.length; j++) {
+                                var image = images[j];
+                                if (image.type == 0) {
+                                    imageName = image.src;
+                                    break;
+                                }
+                            }
+                            s += "<table width='1000px' cellspacing='0' cellpadding='0' style='border: 1px #cccccc solid'>" +
+                                    "<tr class='tr2'>" +
+                                        "<td class='td1'><input type='checkbox' name='cartids' value='" + cart.id + "' class='carts'></td>" +
+                                        "<td class='td2'>" +
+                                            "<ul>" +
+                                                "<li class='tr2_li1'><a href=''><img src='../images/item/productSinglePicture/" + imageName + "' height='80px'/></a></li>" +
+                                                "<li class='tr2_li2'><a href=''>" + cart.product.name + "</a></li>" +
+                                            "</ul>" +
+                                        "</td>" +
+                                        "<td class='td3'>￥<span>" + cart.product.salePrice + "</span></td>" +
+                                        "<td class='td4'>" +
+                                            "<input type='button' value='-' class='minus'>" +
+                                            "<input type='text' value='" + cart.quantity + "' class='quantity'>" +
+                                            "<input type='button' value='+' class='plus'>" +
+                                        "</td>" +
+                                        "<td class='td5' style='color: #881111'>￥<span>" + cart.amount + "</span></td>" +
+                                        "<td class='td6'><a href='' class='del'>删除</a></td>" +
+                                "</tr>" +
+                                "</table>";
+                        }
+                        $("#c_con_table").html($("#c_con_table").html() + s);
+                    }
+                    //购物车数量减少
+                    $(".minus").click(function () {
+                        // 获取购物车商品数量, next()获取下一个兄弟元素
+                        var num = $(this).next().val();
+                        // 获取当前购物车记录的id值, parents("tr")获取当前的tr标签
+                        var cid = $(this).parents("tr").find("input:eq(0)").val();
+                        if (num > 1){
+                            var quantity = num - 1;
+                            fun1(quantity, cid); // 发送AJAX请求
+                        }
+                    });
+                    // 购物车数量增加
+                    $(".plus").click(function () {
+                        // 获取购物车商品数量, prev()获取当前标签的上一个兄弟元素
+                        var num = parseInt($(this).prev().val());
+                        // 获取当前购物车记录的id值
+                        var cid = $(this).parents("tr").find("input:eq(0)").val();
+                        if (num < 10) {
+                            var quantity = num + 1;
+                            fun1(quantity, cid);// 发送AJAX请求
+                        }
+                        else {
+                            alert("最大购买数量是10");
+                        }
+                    })
+
+                    // 手动输入商品数量, change是内容改变触发事件
+                    $(".quantity").change(function () {
+                        var num = $(this).val();
+                        // 获取当前购物车记录的id值
+                        var cid = $(this).parents("tr").find("input:eq(0)").val();
+                        if (isNaN(num)) {
+                            // 如果输入的不是数字, 数量设为1
+                            $(this).val(1);
+                            fun1(1, cid);// 发送AJAX请求
+                        }
+                        else {
+                            if (parseInt(num) < 1) {
+                                $(this).val(1);
+                                fun1(1, cid);// 发送AJAX请求
+                            }
+                            else if (parseInt(num) > 10) {
+                                alert("最大购买数量是10");
+                                $(this).val(10);
+                                fun1(10, cid);// 发送AJAX请求
+                            }
+                            else {
+                                fun1(num, cid);// 发送AJAX请求
+                            }
+                        }
+                    });
+                    // 删除一条购物车记录
+                    $(".del").click(function() {
+                        $("#main").fadeIn(); // 隐藏的标签显示
+                        $("#middle").fadeIn();
+                        $("#content").html("确认要删除该宝贝吗？");
+                        // 获取当前购物车记录的id值
+                        var cid = $(this).parents("tr").find("input:eq(0)").val();
+                        // 确定删除
+                        $("#confirm").click(function () {
+                            $.ajax({
+                                url : "../cart/" + cid,
+                                type : "delete",
+                                success : function (result) {
+                                    window.location.reload();
+                                }
+                            })
+                        })
+                        return false;
+                    });
+                    // 取消删除
+                    $("#cancel").click(function () {
+                        $("#main").fadeOut();// 隐藏标签
+                    });
+                    // 关闭按钮
+                    $("#del").click(function () {
+                        $("#main").fadeOut();// 隐藏标签
+                    });
+                }
+            })
+        })
+
+        // 发送AJAX请求的函数
+        function fun1(quantity, cid) {
+            $.ajax({
+                url : "../cart/updateQuantity",
+                type: "put",
+                data : {quantity : quantity, cid : cid},
+                success : function (result) {
+                    if (result == "success") {
+                        // 页面刷新
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<div id="main">
+    <div id="middle">
+        <div id="message">
+            <ul>
+                <li><span id="delete">删除宝贝</span><span id="del">×</span></li>
+                <li><span id="content"></span></li>
+                <li>
+                    <input type="button" value="确&nbsp;定" id="confirm">
+                    <input type="button" value="取&nbsp;消" id="cancel">
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="con">
+    <div id="c_con">
+        <div id="c_con_head">
+            <span id="c_con_span">已选商品</span>
+            <span id="c_con_head_s1">￥</span>
+            <span id="c_con_head_s2">0.00</span>
+            <input type="button" value="结&nbsp;&nbsp;算" class="settlement">
+        </div>
+        <div id="c_con_table">
+            <table width="1000px" cellpadding="0" cellspacing="0">
+                <tr class="tr1">
+                    <td class="td1">
+                        <input type="checkbox" class="check">&nbsp;&nbsp;全选
+                    </td>
+                    <td class="td2">商品信息</td>
+                    <td class="td3">单价</td>
+                    <td class="td4">数量</td>
+                    <td class="td5">金额</td>
+                    <td class="td6">操作</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.dao.CartDao">
+    <resultMap id="cartMap" type="Cart">
+        <id property="id" column="cart_id"/>
+        <result property="quantity" column="product_quantity"/>
+        <result property="amount" column="cart_amount"/>
+        <result property="create" column="cart_create"/>
+        <result property="modified" column="cart_modified"/>
+        <association property="product" column="product_id" resultMap="productMap"/>
+        <association property="user" column="user_id" resultMap="userMap"/>
+    </resultMap>
+    <resultMap id="productMap" type="product">
+        <id property="id" column="product_id"/>
+        <result property="name" column="product_name"/>
+        <result property="title" column="product_title"/>
+        <result property="price" column="product_price"/>
+        <result property="salePrice" column="product_sale_price"/>
+        <result property="status" column="product_status"/>
+        <result property="createTime" column="product_create"/>
+        <result property="modifiedTime" column="product_modified"/>
+        <association property="category" column="category_id" resultMap="categoryMap"/>
+        <collection property="images" ofType="ProductImage">
+            <id property="id" column="image_id"/>
+            <result property="type" column="image_type"/>
+            <result property="src" column="image_src"/>
+        </collection>
+    </resultMap>
+    <resultMap id="userMap" type="User">
+        <id property="id" column="user_id"/>
+        <result property="username" column="user_username"/>
+        <result property="nickname" column="user_nickname"/>
+        <result property="password" column="user_password"/>
+        <result property="gender" column="user_gender"/>
+        <result property="birthday" column="user_birthday"/>
+        <result property="profilePictureSrc" column="user_profile_picture_src"/>
+        <result property="createTime" column="user_create"/>
+        <result property="modifiedTime" column="user_modified"/>
+    </resultMap>
+    <!-- 用户添加商品到购物车 -->
+    <insert id="save" parameterType="Cart">
+        insert into t_cart (product_id,product_quantity,cart_amount,user_id,cart_create,cart_modified)
+        values(#{product.id},#{quantity},#{amount},#{user.id},now(),now())
+    </insert>
+
+    <!-- 当前用户的购物车是否有相同商品 -->
+    <select id="getCart" parameterType="Cart" resultType="int">
+        select count(*) from t_cart where product_id=#{product.id} and user_id=#{user.id}
+    </select>
+
+    <!-- 根据购物车ID查询一条购物车记录 -->
+    <select id="getById" parameterType="int" resultMap="cartMap">
+        select * from t_cart t1, t_product t2, t_product_image t3
+        where t1.product_id=t2.product_id and t2.product_id=t3.product_id and t1.cart_id=#{id}
+    </select>
+
+    <!-- 修改购物车的商品数量 -->
+    <update id="updateQuantity" parameterType="Cart">
+        update t_cart set product_quantity=#{quantity}, cart_amount=#{amount} where cart_id=#{id}
+    </update>
+
+    <!-- 用户查询购物车记录，降序排列 -->
+    <select id="getByUser" parameterType="int" resultMap="cartMap">
+        select * from t_cart t1,t_product t2,t_product_image t3
+        where t1.product_id=t2.product_id and t2.product_id=t3.product_id and
+        t1.user_id=#{userId} order by t1.cart_create desc
+    </select>
+
+    <!-- 删除购物车记录 -->
+    <delete id="delete" parameterType="int">
+        delete from t_cart where cart_id=#{id}
+    </delete>
+</mapper>

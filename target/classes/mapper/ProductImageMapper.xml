@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.dao.ProductImageDao">
+    <resultMap id="imageMap" type="ProductImage">
+        <id property="id" column="image_id"/>
+        <result property="type" column="image_type"/>
+        <result property="src" column="image_src"/>
+    </resultMap>
+    <!--根据商品的id查询商品的一张概述图片-->
+    <select id="getByProduct" parameterType="int" resultType="String">
+        select image_src from t_product_image where product_id=#{pid} and image_type=0 limit 0, 1
+    </select>
+</mapper>

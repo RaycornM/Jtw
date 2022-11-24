@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            font-size: 12px;
+        }
+        #con {
+            margin-top: 50px;
+            background: #EAE7E9;
+        }
+        #c_con {
+            width: 1200px;
+            position: relative;
+            left: 50%;
+            margin-left: -600px;
+            border: 1px #ff0000 solid;
+            background: #ffffff;
+        }
+        #c_con_top {
+            width: 1200px;
+            height: 450px;
+            border: 1px #f00000 solid;
+        }
+        #c_con_top_left, #c_con_top_right {
+            float: left;
+        }
+        #c_con_top_left {
+            width: 500px;
+            height: 450px;
+            border: 1px #f00000 solid;
+        }
+        #c_con_top_right {
+            width: 650px;
+            height: 450px;
+            border: 1px #f00000 solid;
+        }
+        /*商品大图*/
+        #c_con_top_left_up {
+            width: 450px;
+            height: 360px;
+            text-align: center;
+            border: 1px #f00000 solid;
+        }
+        /*商品小图*/
+        #c_con_top_left_down {
+            width: 450px;
+            height: 90px;
+            border: 1px #f00000 solid;
+        }
+        #c_con_top_left_down img {
+            margin-left: 5px;
+            margin-right: 5px;
+            cursor: pointer; /*鼠标放在上边编程手型*/
+        }
+        /*商品信息*/
+        #c_con_top_right tr {
+            height: 85px;
+            border: 1px #f00000 solid;
+        }
+    </style>
+    <script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            // 获取当前页面的路径(http://localhost:8080/html/item.html?id=X)
+            var href = window.location.href;
+            // 获取X前面等号的位置
+            var index = href.lastIndexOf("=");
+            //获取X
+            var id = href.substring(index + 1);
+            $.ajax({
+                url : "../product/" + id,
+                type : "get",
+                success : function (result) {
+                    var product = eval(result);
+                    // 获取所有的图片
+                    var images = product.images;
+                    // 概述图大图
+                    var singleImage1 = "";
+                    // 概述图小图
+                    var singleImage2 = "";
+                    // 详情图
+                    var detailsImage = "";
+                    for (var i = 0; i < images.length; i++) {
+                        var image = images[i];
+                        if (image.type == 0) {
+                            // 概述图
+                            singleImage1 += "<img alt='' src='../images/item/productSinglePicture/" + image.src + "' height='360px'/>";
+                            singleImage2 += "<img alt='' src='../images/item/productSinglePicture/" + image.src + "' height='80px'/>";
+                        }
+                        else {
+                            // 详情图
+                            detailsImage += "<img alt='' src='../images/item/productDetailsPicture/" + image.src + "'/>";
+                        }
+                    }
+                    $("#c_con_top_left_up").html(singleImage1);
+                    $("#c_con_top_left_down").html(singleImage2);
+                    $("#c_con_bottom").html(detailsImage);
+                    $("#product_name").html(product.name); // 商品名字
+                    $("#product_price del").html(product.price);
+                    $("#product_sale_price").html(product.salePrice);
+
+                    // ------------------页面内容操作------------------
+                    // 商品概述大图只显示一张图片
+                    $("#c_con_top_left_up img").css("display", "none").filter(":eq(0)").show();
+                    // 鼠标经过商品概述小图, 大图位置切换图片
+                    $("#c_con_top_left_down img").each(function (n) { // each表示循环遍历, n就是当前遍历的第几张图片
+                        // 注册鼠标经过事件
+                        $(this).mouseover(function () {
+                            $("#c_con_top_left_up img").css("display", "none").filter(":eq(" + n + ")").show();
+                        });
+                    });
+
+                    // 添加商品到购物车
+                    $("#add_cart").click(function () {
+                        // 获取商品id
+                        var productId = product.id;
+                        // 获取购买数量
+                        var quantity = $("input[name='quantity']").val();
+                        // 发送AJAX请求, 添加商品到购物车
+                        $.ajax({
+                            url : "../cart",
+                            type : "post",
+                            data : {productId : productId, quantity : quantity},
+                            success : function (result1) {
+                                if (result1 == "login") {
+                                    // 未登录, 访问登录页面
+                                    window.location.href = "login.html";
+                                }
+                                else if (result1 == "success") {
+                                    alert("添加购物车成功");
+                                }
+                            },
+                            error : function () {
+                                alert("添加购物车失败");
+                            }
+                        });
+                    });
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+<div id="con">
+    <div id="c_con">
+        <!-- 商品概述图和商品信息 -->
+        <div id="c_con_top">
+            <!-- 商品图片 -->
+            <div id="c_con_top_left">
+                <!-- 大图 -->
+                <div id="c_con_top_left_up"></div>
+                <!-- 小图 -->
+                <div id="c_con_top_left_down"></div>
+            </div>
+            <!-- 商品信息 -->
+            <div id="c_con_top_right">
+                <table width="630px" align="center">
+                    <tr>
+                        <td colspan="2" id="product_name"></td>
+                    </tr>
+                    <tr>
+                        <td>原价</td>
+                        <td id="product_price"><del></del></td>
+                    </tr>
+                    <tr>
+                        <td>现价</td>
+                        <td id="product_sale_price"></td>
+                    </tr>
+                    <tr>
+                        <td>购买数量</td>
+                        <td>
+                            <input type="button" value="-">
+                            <input type="text" value="1" name="quantity">
+                            <input type="button" value="+">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="button" value="立即购买" id="buy_now">
+                            <input type="button" value="加入购物车" id="add_cart">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- 商品详情图 -->
+        <div id="c_con_bottom"></div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            font-size: 12px;
+        }
+        #con {
+            margin-top: 50px;
+            background: #EAE7E9;
+        }
+        #c_con {
+            width: 1200px;
+            position: relative;
+            left: 50%;
+            margin-left: -600px;
+            border: 1px #ff0000 solid;
+            background: #ffffff;
+        }
+        .c_con_pro {
+            width: 380px;
+            height: 180px;
+            float: left;
+            margin: 5px;
+            border-radius: 8px;
+            border: 1px #ffffff solid;
+        }
+        .c_con_pro:hover {
+            border: 1px #881111 solid;
+            cursor: pointer;
+        }
+        .c_con_pro div {
+            float: left;
+        }
+        .c_con_pro_img, .c_con_pro_desc {
+            width: 160px;
+            height: 160px;
+            margin-left: 15px;
+            margin-right: 15px;
+            margin-top: 10px;
+        }
+        #c_con_clear {
+            clear: both; /*去掉浮动*/
+        }
+        .c_con_pro_clear {
+            clear: both;
+        }
+        .c_con_pro_desc_name {
+            color: #333333;
+        }
+        .c_con_pro_desc_name:hover {
+            color: #881111;
+        }
+        .c_con_pro_desc_price {
+            color: #881111;
+            font-size: 18px;
+        }
+    </style>
+    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url : "product/listPage",
+                type : "get",
+                success : function (result) {
+                    var products = eval(result); // eval把JSON字符串转换为JS对象
+                    var ps = "";
+                    for(var i = 0; i < products.length; i++) {
+                        var product = products[i];
+                        var src = "";
+                        // 再次发送请求, 查询商品的一张图片
+                        $.ajax({
+                            url : "productImage/getByProduct/" + product.id, // 根据商品的id查询一张图片
+                            type : "get",
+                            async : false, // 不是异步, 目的是给外部的变量赋值
+                            success : function (result) {
+                                src = result;
+                            }
+                        });
+                        ps += "<a href='html/item.html?id=" + product.id + "'><div class='c_con_pro'><div class='c_con_pro_img'>" +
+                            "<img src='images/item/productSinglePicture/" + src + "' height='150px'/>" +
+                            "</div><div class='c_con_pro_desc'>" +
+                            "<span class='c_con_pro_desc_name'>" + product.name + "</span><br>" +
+                            "<span class='c_con_pro_desc_price'>￥" + product.salePrice + "</span>" +
+                            "</div></div></a>";
+                    }
+                    ps += "<div class='c_con_pro_clear'></div>";
+                    $("#c_con").html(ps);
+                }
+            });
+        })
+    </script>
+</head>
+<body>
+    <div id="con">
+        <div id="c_con"></div>
+        <div id="c_con_clear"></div>
+    </div>
+</body>
+</html>
